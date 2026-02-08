@@ -1,1 +1,362 @@
 
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Position — это не ярлык. Это репутация.</title>
+    <!-- Подключаем Tailwind CSS для современных стилей -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Подключаем GSAP - библиотеку для сложных анимаций -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <!-- Ваши старые стили (оставлены для совместимости) -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Новые стили для модальных окон и кастомных анимаций -->
+    <style>
+        /* Стили для плавных анимаций появления */
+        .fade-in-element {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        /* Стили для модального окна (всплывашки) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-content {
+            background: #1a1a1a;
+            padding: 2.5rem;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            border: 1px solid #2a2a2a;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .modal-close:hover {
+            color: white;
+        }
+        /* Анимация параллакса для фона */
+        .parallax-bg {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        /* Улучшенные стили для кнопок Telegram */
+        .tg-button {
+            background: transparent;
+            color: #0a8;
+            border: 2px solid #0a8;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        .tg-button:hover {
+            background: #0a8;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(10, 136, 136, 0.3);
+        }
+        /* Анимация подпрыгивания для призыва к действию */
+        @keyframes pulse-soft {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .pulse-animation {
+            animation: pulse-soft 2s infinite ease-in-out;
+        }
+        /* Анимация вращения для логотипа (пример) */
+        @keyframes subtle-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .logo-rotate {
+            display: inline-block;
+            transition: transform 0.5s ease;
+        }
+        .logo-rotate:hover {
+            animation: subtle-rotate 2s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-200 font-sans leading-relaxed">
+    <!-- Главная секция с параллаксом и анимацией -->
+ <section class="min-h-screen flex flex-col justify-center items-center text-center px-6 parallax-bg relative overflow-hidden" id="hero" style="background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=1000');">
+        <div class="relative z-10 max-w-4xl mx-auto fade-in-element">
+            <!-- Место для вашего логотипа с анимацией при наведении -->
+            <div class="mb-8">
+                <div class="logo-rotate text-4xl font-bold text-emerald-600 tracking-widest">P</div>
+            </div>
+            
+            <h1 class="text-5xl md:text-7xl font-serif mb-6 leading-tight text-white">
+                Position — это не ярлык.<br>
+                <span class="text-emerald-500">Это репутация.</span>
+            </h1>
+            
+            <p class="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto mb-10">
+                Премиальные рубашки для мужчин, которые знают свою ценность.
+            </p>
+            
+            <!-- Кнопка с анимацией пульсации -->
+            <div class="pulse-animation">
+                <a href="#catalog" class="tg-button text-lg px-10 py-4 font-semibold">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.95 1.24-5.5 3.64-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.26.39-.53 1.07-.82 4.08-1.77 6.8-2.94 8.14-3.52 3.88-1.66 4.69-1.95 5.22-1.97.12 0 .38.03.55.18.14.12.18.28.2.39.02.1.04.28.02.43z"/>
+                    </svg>
+                    Заказать в Telegram
+                </a>
+            </div>
+        </div>
+        
+        <!-- Анимированная стрелка вниз -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 fade-in-element" style="animation-delay: 1s;">
+            <div class="animate-bounce text-emerald-500">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Секция философии -->
+    <section class="py-20 px-6 max-w-5xl mx-auto" id="philosophy">
+        <h2 class="text-4xl font-serif text-center mb-16 text-white fade-in-element">Философия</h2>
+        
+        <div class="grid md:grid-cols-2 gap-12">
+            <div class="fade-in-element">
+                <p class="text-xl text-gray-300 mb-6">
+                    Position — это про осанку, уверенность и уважение к деталям. Мы создаём рубашки для мужчин, которые выбирают не моду, а статус, не громкость, а точность.
+                </p>
+                <div class="bg-gray-900 p-6 rounded-lg border-l-4 border-emerald-600">
+                    <h3 class="text-xl font-semibold text-white mb-3">Тихая компетентность</h3>
+                    <p class="text-gray-400">Никаких логотипов на видных местах. Узнаваемость по крою, ткани, деталям. Роскошь в незаметном.</p>
+                </div>
+            </div>
+            
+            <div class="space-y-6 fade-in-element" style="animation-delay: 0.2s;">
+                <div class="flex items-start gap-4">
+                    <div class="bg-emerald-900/30 p-3 rounded-full">
+                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/> 
+            </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-medium text-white">Египетский хлопок 200s</h4>
+                        <p class="text-gray-400">Плотность 140-160 г/м² для идеального драпирования</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start gap-4">
+                    <div class="bg-emerald-900/30 p-3 rounded-full">
+                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-medium text-white">Ручной контроль качества</h4>
+                        <p class="text-gray-400">Каждый шов проверяется мастером</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start gap-4">
+                    <div class="bg-emerald-900/30 p-3 rounded-full">
+                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-medium text-white">Контрастная детализация</h4>
+                        <p class="text-gray-400">Скрытая строчка тёмно-бордовой нитью внутри воротника</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Секция каталога с модальными окнами -->
+    <section class="py-20 px-6 bg-gray-900/50" id="catalog">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-4xl font-serif text-center mb-16 text-white fade-in-element">Каталог</h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Карточка товара 1 -->
+                <article class="group bg-gray-800 rounded-xl overflow-hidden transition-all duration-500 hover:bg-gray-700 hover:shadow-2xl hover:shadow-emerald-900/20 fade-in-element catalog-item" data-modal="modal-1">
+                    <div class="h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=500" alt="Classic White" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-2xl font-serif text-white">Classic White</h3>
+                            <span class="text-emerald-400 font-bold">12 900 ₽</span>
+                        </div>
+                        <p class="text-gray-400 mb-6">Идеальная белая рубашка для деловых и вечерних образов.</p>
+                        <div class="flex gap-3">
+                            <button class="modal-trigger flex-1 bg-gray-700 hover:bg-emerald-700 text-white py-3 rounded-lg transition-colors" data-target="modal-1">
+                                Подробнее
+                            </button>
+                            <a href="https://t.me/position_consultant_bot" class="tg-button py-3">
+                                Заказать
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Карточка товара 2 -->
+                <article class="group bg-gray-800 rounded-xl overflow-hidden transition-all duration-500 hover:bg-gray-700 hover:shadow-2xl hover:shadow-emerald-900/20 fade-in-element catalog-item" data-modal="modal-2" style="animation-delay: 0.1s;">
+                  <div class="h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1621072156002-e2fccdc0b176?q=80&w=500" alt="Midnight Blue" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-2xl font-serif text-white">Midnight Blue</h3>
+                            <span class="text-emerald-400 font-bold">13 500 ₽</span>
+                        </div>
+                        <p class="text-gray-400 mb-6">Глубокий синий цвет и безупречная посадка.</p>
+                        <div class="flex gap-3">
+                            <button class="modal-trigger flex-1 bg-gray-700 hover:bg-emerald-700 text-white py-3 rounded-lg transition-colors" data-target="modal-2">
+                                Подробнее
+                            </button>
+                            <a href="https://t.me/position_consultant_bot" class="tg-button py-3">
+                                Заказать
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Карточка товара 3 -->
+                <article class="group bg-gray-800 rounded-xl overflow-hidden transition-all duration-500 hover:bg-gray-700 hover:shadow-2xl hover:shadow-emerald-900/20 fade-in-element catalog-item" data-modal="modal-3" style="animation-delay: 0.2s;">
+                    <div class="h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1578932750294-f5075e85f44a?q=80&w=500" alt="Graphite" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-2xl font-serif text-white">Graphite</h3>
+                            <span class="text-emerald-400 font-bold">13 200 ₽</span>
+                        </div>
+                        <p class="text-gray-400 mb-6">Темно-серый оттенок для строгого стиля.</p>
+                        <div class="flex gap-3">
+                            <button class="modal-trigger flex-1 bg-gray-700 hover:bg-emerald-700 text-white py-3 rounded-lg transition-colors" data-target="modal-3">
+                                Подробнее
+                            </button>
+                            <a href="https://t.me/position_consultant_bot" class="tg-button py-3">
+                                Заказать
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Карточка товара 4 -->
+                <article class="group bg-gray-800 rounded-xl overflow-hidden transition-all duration-500 hover:bg-gray-700 hover:shadow-2xl hover:shadow-emerald-900/20 fade-in-element catalog-item" data-modal="modal-4" style="animation-delay: 0.3s;">
+                    <div class="h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=500" alt="Ivory" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-2xl font-serif text-white">Ivory</h3>
+                            <span class="text-emerald-400 font-bold">14 000 ₽</span>
+                        </div>
+                        <p class="text-gray-400 mb-6">Мягкий оттенок слоновой кости для утончённого образа.</p>
+                        <div class="flex gap-3">
+                            <button class="modal-trigger flex-1 bg-gray-700 hover:bg-emerald-700 text-white py-3 rounded-lg transition-colors" data-target="modal-4">
+                                Подробнее
+                            </button>
+                            <a href="https://t.me/position_consultant_bot" class="tg-button py-3">
+                                Заказать
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Модальные окна для подробного просмотра товаров -->
+    <!-- Модалка для Classic White -->
+    <div class="modal" id="modal-1">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=800" alt="Classic White" class="w-full rounded-lg">
+                </div>
+                <div>
+                    <h3 class="text-3xl font-serif text-white mb-4">Classic White</h3>
+                    <p class="text-gray-300 mb-6">Идеальная белая рубашка для деловых и вечерних образов. Сшита из египетского хлопка 200s с контрастной строчкой внутри воротника.</p>
+                    
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-white mb-3">Детали</h4>
+                        <ul class="space-y-2 text-gray-400">
+                            <li class="flex items-center gap-2"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Египетский хлопок 200s, 140 г/м²</li>
+                            <li class="flex items-center gap-2"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Полураспашной английский воротник</li>
+                            <li class="flex items-center gap-2"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Двойные манжеты (French cuffs)</li>
+                            <li class="flex items-center gap-2"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Скрытая нумерация на подоле</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-3xl text-emerald-400 font-bold">12 900 ₽</span>
+                        <a href="https://t.me/position_consultant_bot" class="tg-button px-8">
+                            Заказать в Telegram
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка для Midnight Blue -->
+    <div class="modal" id="modal-2">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <img src="https://images.unsplash.com/photo-1621072156002-e2fccdc0b176?q=80&w=800" alt="Midnight Blue" class="w-full rounded-lg">
+                </div>
+                <div>
+                    <h3 class="text-3xl font-serif text-white mb-4">Midnight Blue</h3>
+                    <p class="text-gray-300 mb-6">Глубокий синий цвет и безупречная посадка. Рубашка для важных встреч и решений.</p>
+                    
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-white mb-3">Детали</h4>
+                        <ul class="space-y-2 text-gray-400">
+                            <li class="flex items-center gap-2"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Египетский хлопок 200s, 160 г/м²</li>
+                            <li class="flex items-center gap-2"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Усиленные локти для долговечности</li>
+                            <li class="flex items-center gap-2"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Французские швы по всей конструкции</li>
+                            <li class="flex items-center gap-2"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Перламутровые пуговицы с гравировкой</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-3xl tex
