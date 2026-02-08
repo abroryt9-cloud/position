@@ -1,566 +1,125 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POSITION — Репутация, а не ярлык</title>
-    <style>
-        /* === ОСНОВНЫЕ СТИЛИ === */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        
-        body {
-            background: #0a0a0a;
-            color: #e8e8e8;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        /* === АНИМАЦИИ === */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* === ШАПКА С ПАРАЛЛАКСОМ === */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            background: 
-                linear-gradient(rgba(10,10,10,0.85), rgba(10,10,10,0.9)),
-                url('https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=1920') center/cover fixed;
-            position: relative;
-            animation: fadeIn 1.2s ease-out;
-        }
-        
-        .hero-content {
-            position: relative;
-            z-index: 2;
-        }
-        
-        .hero h1 {
-            font-size: clamp(2.8rem, 6vw, 5rem);
-            font-weight: 300;
-            letter-spacing: -0.02em;
-            margin-bottom: 1.5rem;
-            color: white;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.4);
-        }
-        
-        .hero .highlight {
-            color: #10b981;
-            font-weight: 600;
-            position: relative;
-        }
-        
-        .hero .highlight::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: #10b981;
-            animation: lineReveal 1.5s 0.5s ease-out forwards;
-            transform-origin: right;
-        }
-        
-        @keyframes lineReveal {
-            to { transform: scaleX(1); transform-origin: left; }
-        }
-        
-        .hero p {
-            font-size: 1.3rem;
-            color: #ccc;
-            max-width: 600px;
-            margin: 0 auto 3rem;
-            animation: fadeIn 1s 0.8s both;
-        }
-        
-        /* === КНОПКИ === */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            background: transparent;
-            color: #10b981;
-            border: 2px solid #10b981;
-            padding: 16px 40px;
-            font-size: 1rem;
-            font-weight: 500;
-            text-decoration: none;
-            border-radius: 10px;
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            position: relative;
-            overflow: hidden;
-            animation: fadeIn 1s 1.2s both;
-        }
-        
-        .btn:hover {
-            background: #10b981;
-            color: white;
-            transform: translateY(-4px);
-            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
-        }
-        
-        .btn svg {
-            width: 20px;
-            height: 20px;
-            transition: transform 0.3s;
-        }
-        
-        .btn:hover svg {
-            transform: translateX(5px);
-        }
-        
-        /* === МЕНЮ (3 ТОЧКИ) === */
-        .menu-toggle {
-            position: fixed;
-            top: 25px;
-            right: 25px;
-            width: 48px;
-            height: 48px;
-            background: rgba(20, 20, 20, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-        
-        .menu-toggle:hover {
-            background: rgba(16, 185, 129, 0.1);
-            transform: scale(1.05);
-            border-color: #10b981;
-        }
-        
-        .menu-toggle span {
-            display: block;
-            width: 22px;
-            height: 2px;
-            background: #10b981;
-            border-radius: 1px;
-            transition: all 0.3s;
-        }
-        
-        .mobile-menu {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 300px;
-            height: 100vh;
-            background: rgba(15, 15, 15, 0.98);
-            backdrop-filter: blur(20px);
-            border-left: 1px solid rgba(16, 185, 129, 0.1);
-            z-index: 1001;
-            padding: 30px 25px;
-            transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .menu-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .menu-title {
-            font-family: 'Georgia', serif;
-            font-size: 1.5rem;
-            color: #10b981;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-        }
-        
-        .menu-close {
-            background: none;
-            border: none;
-            color: #999;
-            font-size: 2.2rem;
-            cursor: pointer;
-            line-height: 1;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: all 0.3s;
-        }
-        
-        .menu-close:hover {
-            color: #10b981;
-            background: rgba(16, 185, 129, 0.1);
-        }
-        
-        .mobile-menu ul {
-            list-style: none;
-            flex-grow: 1;
-        }
-        
-        .mobile-menu li {
-            margin-bottom: 15px;
-            opacity: 0;
-            transform: translateX(20px);
-            animation: menuItemFade 0.4s forwards;
-        }
-        
-        .mobile-menu li:nth-child(1) { animation-delay: 0.1s; }
-        .mobile-menu li:nth-child(2) { animation-delay: 0.15s; }
-        .mobile-menu li:nth-child(3) { animation-delay: 0.2s; }
-        .mobile-menu li:nth-child(4) { animation-delay: 0.25s; }
-        .mobile-menu li:nth-child(5) { animation-delay: 0.3s; }
-        
-        @keyframes menuItemFade {
-            to { opacity: 1; transform: translateX(0); }
-        }
-        
-        .mobile-menu a {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 16px 20px;
-            color: #e0e0e0;
-            text-decoration: none;
-            font-size: 1.1rem;
-            border-radius: 10px;
-            transition: all 0.3s;
-            border-left: 3px solid transparent;
-        }
-        
-        .mobile-menu a:hover {
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            padding-left: 24px;
-            border-left-color: #10b981;
-        }
-        
-        .mobile-menu svg {
-            width: 22px;
-            height: 22px;
-            flex-shrink: 0;
-        }
-        
-        .menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(3px);
-            z-index: 999;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        
-        /* === СЕКЦИИ === */
-        section {
-            padding: 100px 0;
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-        
-        section.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        h2 {
-            font-size: clamp(2rem, 4vw, 3rem);
-            text-align: center;
-            margin-bottom: 4rem;
-            color: white;
-            position: relative;
-            display: inline-block;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        
-        h2::after {
-            content: '';
-            position: absolute;
-            bottom: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 3px;
-            background: #10b981;
-            border-radius: 2px;
-        }
-        
-        /* === КАТАЛОГ С ФОТО === */
-        .catalog-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 35px;
-            margin-top: 40px;
-        }
-        
-        .product-card {
-            background: linear-gradient(145deg, #151515 0%, #1a1a1a 100%);
-            border-radius: 18px;
-            padding: 0;
-            border: 1px solid #252525;
-            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            position: relative;
-            overflow: hidden;
-            opacity: 0;
-            transform: translateY(40px) scale(0.95);
-        }
-        
-        .product-card.visible {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-        
-        .product-image {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            border-bottom: 1px solid #252525;
-        }
-        
-        .product-content {
-            padding: 25px;
-        }
-        
-        .product-card:hover {
-            transform: translateY(-12px) scale(1.02);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.3), 0 0 0 1px rgba(16, 185, 129, 0.2);
-            border-color: #10b981;
-        }
-        
-        .product-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, #10b981, transparent);
-            transform: translateX(-100%);
-            transition: transform 0.6s ease;
-        }
-        
-        .product-card:hover::before {
-            transform: translateX(0);
-        }
-        
-        .product-card h3 {
-            font-size: 1.6rem;
-            font-weight: 500;
-            margin-bottom: 10px;
-            color: white;
-        }
-        
-        .product-card .desc {
-            font-size: 1rem;
-            color: #aaa;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-        
-        .product-card .price {
-            font-size: 2rem;
-            color: #10b981;
-            font-weight: 600;
-            margin: 20px 0 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .product-card .price::before {
-            content: '₽';
-            font-size: 1.5rem;
-            opacity: 0.7;
-        }
-        
-        .card-btn {
-            display: block;
-            width: 100%;
-            padding: 16px;
-            text-align: center;
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        
-        .card-btn:hover {
-            background: rgba(16, 185, 129, 0.2);
-            transform: translateY(-3px);
-        }
-        
-        /* === ФУТЕР === */
-        footer {
-            background: #050505;
-            padding: 80px 0 40px;
-            text-align: center;
-            border-top: 1px solid #222;
-            margin-top: 100px;
-        }
-        
-        .footer-text {
-            color: #666;
-            font-size: 0.9rem;
-            letter-spacing: 0.05em;
-            margin-top: 40px;
-        }
-    </style>
-</head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>POSITION</title><style>
+body{background:#0a0a0a;color:#e8e8e8;font-family:sans-serif;margin:0;}.container{max-width:1200px;margin:0 auto;padding:0 20px;}
+/* Анимации */@keyframes fadeIn{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+/* Шапка */.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;background:linear-gradient(rgba(0,0,0,0.8),rgba(0,0,0,0.9)),url('https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=1600')center/cover fixed;animation:fadeIn 1.2s;}
+.hero h1{font-size:3.5rem;color:white;margin-bottom:1rem;}.hero p{font-size:1.3rem;color:#ccc;margin-bottom:2rem;}
+/* Кнопка */.btn{display:inline-block;background:transparent;color:#10b981;border:2px solid #10b981;padding:15px 35px;text-decoration:none;border-radius:8px;transition:all 0.3s;}.btn:hover{background:#10b981;color:white;transform:translateY(-4px);}
+/* Меню (3 точки) */.menu-toggle{position:fixed;top:20px;right:20px;width:44px;height:44px;background:rgba(20,20,20,0.9);border:1px solid rgba(16,185,129,0.3);border-radius:8px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;cursor:pointer;z-index:1000;}
+.menu-toggle span{display:block;width:20px;height:2px;background:#10b981;}
+.mobile-menu{position:fixed;top:0;right:-100%;width:280px;height:100vh;background:rgba(15,15,15,0.98);z-index:1001;padding:30px 25px;transition:right 0.4s;}
+.mobile-menu a{display:flex;align-items:center;gap:12px;padding:15px;color:#e0e0e0;text-decoration:none;border-radius:8px;}.mobile-menu a:hover{background:rgba(16,185,129,0.1);color:#10b981;}
+.menu-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:999;display:none;}
+/* Секции */section{padding:80px 0;opacity:0;transform:translateY(40px);transition:opacity 0.8s, transform 0.8s;}section.visible{opacity:1;transform:translateY(0);}
+h2{font-size:2.5rem;text-align:center;color:white;margin-bottom:3rem;position:relative;}h2::after{content:'';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:60px;height:3px;background:#10b981;}
+/* Каталог с фото */.catalog-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));gap:25px;margin-top:40px;}
+.product-card{background:#151515;border-radius:12px;overflow:hidden;border:1px solid #252525;transition:all 0.4s;opacity:0;transform:translateY(30px);}
+.product-card.visible{opacity:1;transform:translateY(0);}.product-card:hover{transform:translateY(-10px);border-color:#10b981;}
+.product-image{width:100%;height:200px;object-fit:cover;border-bottom:1px solid #252525;}
+.product-content{padding:20px;}.product-card h3{font-size:1.5rem;color:white;margin-bottom:10px;}
+.product-card .price{font-size:1.8rem;color:#10b981;font-weight:600;margin:15px 0;}.card-btn{display:block;padding:12px;background:rgba(16,185,129,0.1);color:#10b981;border:1px solid rgba(16,185,129,0.3);border-radius:6px;text-decoration:none;text-align:center;transition:all 0.3s;}.card-btn:hover{background:rgba(16,185,129,0.2);}
+/* Помощь */.help-item{margin-bottom:25px;padding-left:15px;border-left:3px solid rgba(16,185,129,0.5);}.help-item h4{color:#10b981;margin-bottom:5px;}
+/* Футер */footer{background:#050505;padding:60px 0;text-align:center;border-top:1px solid #222;}
+</style></head>
 <body>
-    <!-- Меню -->
-    <button class="menu-toggle" aria-label="Открыть меню">
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
-    
-    <nav class="mobile-menu">
-        <div class="menu-header">
-            <span class="menu-title">POSITION</span>
-            <button class="menu-close" aria-label="Закрыть меню">×</button>
-        </div>
-        <ul>
-            <li><a href="#philosophy">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                </svg>
-                Философия
-            </a></li>
-            <li><a href="#catalog">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                </svg>
-                Каталог
-            </a></li>
-            <li><a href="#help">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                Помощь
-            </a></li>
-            <li><a href="https://t.me/positionmanual_RU" target="_blank">
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.95 1.24-5.5 3.64-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.26.39-.53 1.07-.82 4.08-1.77 6.8-2.94 8.14-3.52 3.88-1.66 4.69-1.95 5.22-1.97.12 0 .38.03.55.18.14.12.18.28.2.39.02.1.04.28.02.43z"/>
-                </svg>
-                TG-ассистент
-            </a></li>
-            <li><a href="https://t.me/position_consultant_bot" target="_blank">
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.95 1.24-5.5 3.64-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.26.39-.53 1.07-.82 4.08-1.77 6.8-2.94 8.14-3.52 3.88-1.66 4.69-1.95 5.22-1.97.12 0 .38.03.55.18.14.12.18.28.2.39.02.1.04.28.02.43z"/>
-                </svg>
-                Заказать
-            </a></li>
-        </ul>
-    </nav>
-    
-    <div class="menu-overlay"></div>
+<!-- Меню --><button class="menu-toggle"><span></span><span></span><span></span></button>
+<nav class="mobile-menu"><div style="display:flex;justify-content:space-between;margin-bottom:30px;">
+<span style="color:#10b981;font-size:1.3rem;font-weight:600;">POSITION</span>
+<button onclick="closeMenu()" style="background:none;border:none;color:#999;font-size:2rem;cursor:pointer;">×</button>
+</div>
+<a href="#philosophy">📜 Философия</a>
+<a href="#catalog">👔 Каталог</a>
+<a href="#help">❓ Помощь</a>
+<a href="https://t.me/positionmanual_RU" target="_blank">📱 TG-ассистент</a>
+<a href="https://t.me/position_consultant_bot" target="_blank">🛒 Заказать</a>
+</nav>
+<div class="menu-overlay" onclick="closeMenu()"></div>
 
-    <!-- Герой -->
-    <header class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1>POSITION — это <span class="highlight">репутация</span>, а не ярлык</h1>
-                <p>Премиальные рубашки для мужчин, которые знают свою ценность. Каждый элемент — материализованная философия.</p>
-                <a href="#catalog" class="btn">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
-                    </svg>
-                    Изучить каталог
-                </a>
-            </div>
-        </div>
-    </header>
+<!-- Шапка --><header class="hero"><div class="container">
+<h1>POSITION</h1>
+<p>Премиальные рубашки для мужчин, которые знают свою ценность</p>
+<a href="#catalog" class="btn">Смотреть каталог</a>
+</div></header>
 
-    <!-- Философия -->
-    <section id="philosophy">
-        <div class="container">
-            <h2>Философия</h2>
-            <div style="background: #111; border-radius: 20px; padding: 50px; border: 1px solid #222;">
-                <p style="font-size: 1.2rem; line-height: 1.8; color: #ddd;">Position — это про осанку, уверенность и уважение к деталям. Мы создаём рубашки для мужчин, которые выбирают не моду, а статус, не громкость, а точность.</p>
-                <p style="font-size: 1.2rem; line-height: 1.8; color: #ddd; margin-top: 20px;">Это антитренд как стратегия: никаких сезонных коллекций, ярких логотипов и быстрой моды. Только постоянные модели, знак на внутреннем шве и срок изготовления от 14 дней.</p>
-            </div>
-        </div>
-    </section>
+<!-- Философия --><section id="philosophy"><div class="container">
+<h2>Философия</h2>
+<p style="font-size:1.2rem;color:#ddd;max-width:800px;margin:0 auto;">Position — это про осанку, уверенность и уважение к деталям. Мы создаём рубашки для тех, кто выбирает не моду, а статус, не громкость, а точность.</p>
+</div></section>
 
-    <!-- Каталог С ФОТО -->
-    <section id="catalog">
-        <div class="container">
-            <h2>Каталог</h2>
-            <div class="catalog-grid">
-                <!-- Classic White -->
-                <div class="product-card">
-                    <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=800&auto=format&fit=crop" alt="Classic White рубашка" class="product-image">
-                    <div class="product-content">
-                        <h3>Classic White</h3>
-                        <p class="desc">Идеальная белая рубашка из египетского хлопка 200s для деловых и вечерних образов.</p>
-                        <div class="price">12 900</div>
-                        <a href="https://t.me/position_consultant_bot" target="_blank" class="card-btn">Заказать</a>
-                    </div>
-                </div>
-                
-                <!-- Midnight Blue -->
-                <div class="product-card">
-                    <img src="https://images.unsplash.com/photo-1621072156002-e2fccdc0b176?q=80&w=800&auto=format&fit=crop" alt="Midnight Blue рубашка" class="product-image">
-                    <div class="product-content">
-                        <h3>Midnight Blue</h3>
-                        <p class="desc">Глубокий синий цвет и безупречная посадка. Усиленные локти, французские швы.</p>
-                        <div class="price">13 500</div>
-                        <a href="https://t.me/position_consultant_bot" target="_blank" class="card-btn">Заказать</a>
-                    </div>
-                </div>
-                
-                <!-- Graphite -->
-                <div class="product-card">
-                    <img src="https://images.unsplash.com/photo-1578932750294-f5075e85f44a?q=80&w=800&auto=format&fit=crop" alt="Graphite рубашка" class="product-image">
-                    <div class="product-content">
-                        <h3>Graphite</h3>
-                        <p class="desc">Темно-серый оттенок для строгого стиля. Современный крой modern fit.</p>
-                        <div class="price">13 200</div>
-                        <a href="https://t.me/position_consultant_bot" target="_blank" class="card-btn">Заказать</a>
-                    </div>
-                </div>
-                
-                <!-- Ivory -->
-                <div class="product-card">
-                    <img src="https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=800&auto=format&fit=crop" alt="Ivory рубашка" class="product-image">
-                    <div class="product-content">
-                        <h3>Ivory</h3>
-                        <p class="desc">Мягкий оттенок слоновой кости для утончённого образа. Высота стойки воротника 4 см.</p>
-                        <div class="price">14 000</div>
-                        <a href="https://t.me/position_consultant_bot" target="_blank" class="card-btn">Заказать</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        </section>
+<!-- Каталог --><section id="catalog"><div class="container">
+<h2>Каталог</h2>
+<div class="catalog-grid">
+<div class="product-card"><img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=500" alt="Classic White" class="product-image"><div class="product-content"><h3>Classic White</h3><p>Идеальная белая рубашка</p><div class="price">12 900 ₽</div><a href="https://t.me/position_consultant_bot" target="_blank" class="card-btn">Заказать</a></div></div>
+<div class="product-card"><img src="https://images.unsplash.com/photo-1621072156002-e2fccdc0b176?q=80&w=500" alt="Midnight Blue" class="product-image"><div class="product-content"><h3>Midnight Blue</h3><p>Глубокий синий цвет</p><div class="price">13 500 ₽</div><a href="https://t.me/position_consultant_bot" target="_blank" class="card-btn">Заказать</a></div></div>
+<div class="product-card"><img src="https://images.unsplash.com/photo-1578932750294-f5075e85f44a?q=80&w=500" alt="Graphite" class="product-image"><div class="product-content"><h3>Graphite</h3><p>Темно-серый оттенок</p><div class="price">13 200 ₽</div><a href="https://t.me/position_consultant_bot" target="_blank" class="card-btn">Заказать</a></div></div>
+<div class="product-card"><img src="https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=500" alt="Ivory" class="product-image"><div class="product-content"><h3>Ivory</h3><p>Мягкий оттенок слоновой кости</p><div class="price">14 000 ₽</div><a href="https://t.me/position_consultant_bot" target="_blank" class="card-btn">Заказать</a></div></div>
+</div></div></section>
+
+<!-- Помощь --><section id="help"><div class="container">
+<h2>Помощь</h2>
+<div style="max-width:800px;margin:0 auto;">
+<div class="help-item"><h4>Как заказать?</h4><p>Напишите TG-ассистенту или нажмите "Заказать" в карточке</p></div>
+<div class="help-item"><h4>Сроки</h4><p>Изготовление от 14 дней после предоплаты</p></div>
+<div class="help-item"><h4>Доставка</h4><p>По всей России. В Москве и СПб — бесплатно от 25 000 ₽</p></div>
+</div></div></section>
+
+<!-- Футер --><footer><div class="container">
+<a href="https://t.me/position_consultant_bot" target="_blank" class="btn">Написать в Telegram</a>
+<p style="color:#666;margin-top:40px;">© 2025 POSITION. Position is earned, not given.</p>
+</div></footer>
+
+<script>
+// Анимации при скролле
+document.addEventListener('DOMContentLoaded', function() {
+    const sections = document.querySelectorAll('section');
+    const cards = document.querySelectorAll('.product-card');
     
-            
+    function checkScroll() {
+        sections.forEach(section => {
+            if (section.getBoundingClientRect().top < window.innerHeight - 100) {
+                section.classList.add('visible');
+            }
+        });
+        cards.forEach((card, i) => {
+            if (card.getBoundingClientRect().top < window.innerHeight - 100) {
+                setTimeout(() => card.classList.add('visible'), i * 100);
+            }
+        });
+    }
+    checkScroll();
+    window.addEventListener('scroll', checkScroll);
+    
+    // Параллакс
+    window.addEventListener('scroll', () => {
+        document.querySelector('.hero').style.backgroundPosition = `center ${window.pageYOffset * 0.5}px`;
+    });
+});
+
+// Меню
+function openMenu() {
+    document.querySelector('.mobile-menu').style.right = '0';
+    document.querySelector('.menu-overlay').style.display = 'block';
+}
+function closeMenu() {
+    document.querySelector('.mobile-menu').style.right = '-100%';
+    document.querySelector('.menu-overlay').style.display = 'none';
+}
+document.querySelector('.menu-toggle').addEventListener('click', openMenu);
+document.querySelectorAll('.mobile-menu a').forEach(link => {
+    if (!link.target) link.addEventListener('click', closeMenu);
+});
+
+// Плавный скролл
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            e.preventDefault();
+            window.scrollTo({top: target.offsetTop - 80, behavior: 'smooth'});
+        }
+    });
+});
+</script>
+</body>
+</html>
