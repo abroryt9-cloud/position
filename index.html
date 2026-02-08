@@ -3,216 +3,441 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Position — репутация, а не ярлык</title>
+    <title>POSITION — Репутация, а не ярлык</title>
     <style>
+        /* Базовые стили */
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body {
-            background-color: #0a0a0a;
+            background: #0a0a0a;
             color: #f0f0f0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            line-height: 1.6;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
         }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         
-        /* Шапка */
+        /* Контейнер */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Шапка с параллаксом */
         .hero {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            background: linear-gradient(rgba(10,10,10,0.85), rgba(10,10,10,0.95)), 
-                        url('https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=1600&auto=format&fit=crop') center/cover fixed;
-            padding: 20px;
+            background: 
+                linear-gradient(135deg, rgba(10,10,10,0.9) 0%, rgba(16,185,129,0.15) 100%),
+                url('https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=1920') center/cover fixed;
+            position: relative;
+            overflow: hidden;
         }
-        .hero-content { max-width: 800px; }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 50%, rgba(16,185,129,0.1) 0%, transparent 50%);
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 40px;
+            background: rgba(20, 20, 20, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            animation: fadeIn 1.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
         .hero h1 {
-            font-size: clamp(2.5rem, 5vw, 4.5rem);
-            font-weight: 700;
-            margin-bottom: 1rem;
+            font-size: clamp(3rem, 6vw, 5.5rem);
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
             color: white;
+            line-height: 1.1;
+        }
+        .hero .highlight {
+            color: #10b981;
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+        .hero .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #10b981;
+            transform: scaleX(0);
+            transform-origin: right;
+            animation: lineReveal 1.2s 1.2s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+        }
+        @keyframes lineReveal {
+            to { transform: scaleX(1); transform-origin: left; }
         }
         .hero p {
             font-size: 1.4rem;
+            line-height: 1.6;
             color: #ccc;
-            margin-bottom: 2.5rem;
+            margin-bottom: 3rem;
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
+            animation: fadeInUp 1s 0.8s both;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Кнопка */
+        /* Кнопка с анимацией */
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
             background: transparent;
             color: #10b981;
             border: 2px solid #10b981;
-            padding: 16px 40px;
+            padding: 18px 48px;
             font-size: 1.1rem;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s;
             font-weight: 500;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 1s 1.4s both;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
         }
         .btn:hover {
             background: #10b981;
             color: white;
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+        }
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        .btn:active {
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
+        }
+        .btn svg {
+            width: 22px;
+            height: 22px;
+            transition: transform 0.3s;
+        }
+        .btn:hover svg {
+            transform: translateX(5px);
         }
         
         /* Секции */
-        section { padding: 80px 0; }
+        section {
+            padding: 100px 0;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
         h2 {
-            font-size: 2.8rem;
+            font-size: 3.2rem;
+            font-weight: 300;
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 4rem;
             color: white;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: #10b981;
+            border-radius: 2px;
         }
         
         /* Философия */
         .philosophy {
-            background: #111;
-            border-radius: 16px;
-            padding: 50px;
+            background: linear-gradient(135deg, #111 0%, #151515 100%);
+            border-radius: 24px;
+            padding: 60px;
             margin: 0 auto;
             max-width: 900px;
-            border-left: 5px solid #10b981;
+            border: 1px solid #222;
+            position: relative;
+            overflow: hidden;
+        }
+        .philosophy::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(16,185,129,0.05) 0%, transparent 70%);
         }
         .philosophy p {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
+            line-height: 1.8;
             color: #ddd;
+            position: relative;
+            z-index: 1;
         }
         
         /* Каталог */
         .catalog-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 40px;
             margin-top: 40px;
         }
         .product-card {
-            background: #151515;
-            border-radius: 12px;
-            padding: 30px;
+            background: linear-gradient(145deg, #151515 0%, #1a1a1a 100%);
+            border-radius: 20px;
+            padding: 40px 30px;
             border: 1px solid #252525;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(40px) scale(0.95);
+        }
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #10b981, transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        .product-card.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
         }
         .product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(16, 185, 129, 0.3);
             border-color: #10b981;
         }
+        .product-card:hover::before {
+            transform: translateX(0);
+        }
         .product-card h3 {
-            font-size: 1.6rem;
-            margin-bottom: 10px;
+            font-size: 1.8rem;
+            font-weight: 500;
+            margin-bottom: 15px;
             color: white;
         }
+        .product-card .desc {
+            font-size: 1.1rem;
+            color: #999;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
         .product-card .price {
-            font-size: 1.8rem;
+            font-size: 2.2rem;
             color: #10b981;
-            font-weight: 700;
-            margin: 15px 0;
+            font-weight: 600;
+            margin: 20px 0 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .product-card .price::before {
+            content: '₽';
+            font-size: 1.5rem;
+            opacity: 0.7;
+        }
+        .card-btn {
+            display: inline-block;
+            width: 100%;
+            padding: 16px;
+            text-align: center;
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .card-btn:hover {
+            background: rgba(16, 185, 129, 0.2);
+            transform: translateY(-3px);
         }
         
         /* Футер */
         footer {
             background: #050505;
-            padding: 60px 0 30px;
+            padding: 80px 0 40px;
             text-align: center;
             border-top: 1px solid #222;
+            margin-top: 100px;
         }
-        footer p { color: #777; margin-top: 40px; }
+        footer p {
+            color: #666;
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+            margin-top: 40px;
+        }
     </style>
 </head>
 <body>
     <!-- Главный экран -->
     <header class="hero">
         <div class="hero-content container">
-            <h1>POSITION</h1>
-            <p>Премиальные рубашки для мужчин, которые знают свою ценность. Репутация, а не ярлык.</p>
-            <a href="https://t.me/position_consultant_bot" class="btn">Заказать в Telegram</a>
+            <h1>POSITION — это <span class="highlight">репутация</span>,<br>а не ярлык</h1>
+            <p>Премиальные рубашки для мужчин, которые знают свою ценность. Каждый элемент — материализованная философия.</p>
+            <a href="https://t.me/position_consultant_bot" class="btn">
+                <svg fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.95 1.24-5.5 3.64-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.26.39-.53 1.07-.82 4.08-1.77 6.8-2.94 8.14-3.52 3.88-1.66 4.69-1.95 5.22-1.97.12 0 .38.03.55.18.14.12.18.28.2.39.02.1.04.28.02.43z"/>
+                </svg>
+                Заказать в Telegram
+            </a>
         </div>
     </header>
 
     <!-- Философия -->
-    <section class="container">
-        <h2>Философия</h2>
-        <div class="philosophy">
-            <p>Position — это про осанку, уверенность и уважение к деталям. Мы создаём рубашки для мужчин, которые выбирают не моду, а статус, не громкость, а точность. Тихая компетентность вместо громких заявлений.</p>
+    <section id="philosophy">
+        <div class="container">
+            <h2>Философия</h2>
+            <div class="philosophy">
+                <p>Position — это про осанку, уверенность и уважение к деталям. Мы создаём рубашки для мужчин, которые выбирают не моду, а статус, не громкость, а точность. Это антитренд как стратегия: никаких сезонных коллекций, ярких логотипов и быстрой моды. Только постоянные модели, знак на внутреннем шве и срок изготовления от 14 дней.</p>
+            </div>
         </div>
     </section>
 
     <!-- Каталог -->
-    <section class="container">
-        <h2>Каталог</h2>
-        <div class="catalog-grid">
-            <div class="product-card">
-                <h3>Classic White</h3>
-                <p>Идеальная белая рубашка для деловых и вечерних образов.</p>
-                <div class="price">12 900 ₽</div>
-                <a href="https://t.me/position_consultant_bot" class="btn" style="padding: 12px 25px; font-size: 1rem;">Заказать</a>
-            </div>
-            
-            <div class="product-card">
-                <h3>Midnight Blue</h3>
-                <p>Глубокий синий цвет и безупречная посадка.</p>
-                <div class="price">13 500 ₽</div>
-                <a href="https://t.me/position_consultant_bot" class="btn" style="padding: 12px 25px; font-size: 1rem;">Заказать</a>
-            </div>
-            
-            <div class="product-card">
-                <h3>Graphite</h3>
-                <p>Темно-серый оттенок для строгого стиля.</p>
-                <div class="price">13 200 ₽</div>
-                <a href="https://t.me/position_consultant_bot" class="btn" style="padding: 12px 25px; font-size: 1rem;">Заказать</a>
-            </div>
-            
-            <div class="product-card">
-                <h3>Ivory</h3>
-                <p>Мягкий оттенок слоновой кости для утончённого образа.</p>
-                <div class="price">14 000 ₽</div>
-                <a href="https://t.me/position_consultant_bot" class="btn" style="padding: 12px 25px; font-size: 1rem;">Заказать</a>
+    <section id="catalog">
+        <div class="container">
+            <h2>Каталог</h2>
+            <div class="catalog-grid">
+                <div class="product-card">
+                    <h3>Classic White</h3>
+                    <p class="desc">Идеальная белая рубашка из египетского хлопка 200s для деловых и вечерних образов. Полураспашной английский воротник, двойные манжеты.</p>
+                    <div class="price">12 900</div>
+                    <a href="https://t.me/position_consultant_bot" class="card-btn">Заказать</a>
+                </div>
+                
+                <div class="product-card">
+                    <h3>Midnight Blue</h3>
+                    <p class="desc">Глубокий синий цвет и безупречная посадка. Усиленные локти, французские швы, перламутровые пуговицы с гравировкой POSITION.</p>
+                    <div class="price">13 500</div>
+                    <a href="https://t.me/position_consultant_bot" class="card-btn">Заказать</a>
+                </div>
+                
+                <div class="product-card">
+                    <h3>Graphite</h3>
+                    <p class="desc">Темно-серый оттенок для строгого стиля. Современный крой modern fit, контрастная строчка внутри воротника тёмно-бордовой нитью.</p>
+                    <div class="price">13 200</div>
+                    <a href="https://t.me/position_consultant_bot" class="card-btn">Заказать</a>
+                </div>
+                
+                <div class="product-card">
+                    <h3>Ivory</h3>
+                    <p class="desc">Мягкий оттенок слоновой кости для утончённого образа. Высота стойки воротника 4 см, угол разворота 70°, идеальная геометрия.</p>
+                    <div class="price">14 000</div>
+                    <a href="https://t.me/position_consultant_bot" class="card-btn">Заказать</a>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Футер -->
-    <footer class="container">
-        <p>© 2025 POSITION. Position is earned, not given.</p>
+    <footer>
+        <div class="container">
+            <p>© 2025 POSITION. Position is earned, not given.</p>
+        </div>
     </footer>
-</body><script>
-    // Функция для анимации появления элементов
-    function animateOnScroll() {
-        const elements = document.querySelectorAll('.product-card, .philosophy, h2');
-        
-        elements.forEach(element => {
-            const elementTop = element.getBoundingClientRect().top;
-            const windowHeight = window.innerHeight;
-            
-            // Если элемент в поле зрения
-            if (elementTop < windowHeight - 100) {
-                element.style.opacity = '1';
-                element.style.transform = 'translateY(0)';
-                element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-            }
-        });
-    }
 
-    // Настройка элементов перед анимацией
-    document.addEventListener('DOMContentLoaded', function() {
-        // Скрываем элементы, которые будут появляться
-        const animatedElements = document.querySelectorAll('.product-card, .philosophy, h2');
-        animatedElements.forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(30px)';
+    <script>
+        // Анимация появления секций при скролле
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('section');
+            const cards = document.querySelectorAll('.product-card');
+            
+            function checkVisibility() {
+                sections.forEach(section => {
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top < window.innerHeight - 100) {
+                        section.classList.add('visible');
+                    }
+                });
+                
+                cards.forEach((card, index) => {
+                    const rect = card.getBoundingClientRect();
+                    if (rect.top < window.innerHeight - 100) {
+                        setTimeout(() => {
+                            card.classList.add('visible');
+                        }, index * 150); // Задержка для последовательного появления
+                    }
+                });
+            }
+            
+            // Проверяем при загрузке и скролле
+            checkVisibility();
+            window.addEventListener('scroll', checkVisibility);
+            
+            // Параллакс для героя
+            window.addEventListener('scroll', function() {
+                const scrolled = window.pageYOffset;
+                const hero = document.querySelector('.hero');
+                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+            });
+            
+            // Плавный скролл для якорных ссылок
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href === '#') return;
+                    
+                    const target = document.querySelector(href);
+                    if (target) {
+                        e.preventDefault();
+                        window.scrollTo({
+                            top: target.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
         });
-        
-        // Запускаем при загрузке
-        animateOnScroll();
-        
-        // И при скролле
-        window.addEventListener('scroll', animateOnScroll);
-    });
-</script>
-</html>
+    </script>
+</body>
+        </html>
