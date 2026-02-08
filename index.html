@@ -181,5 +181,38 @@
     <footer class="container">
         <p>© 2025 POSITION. Position is earned, not given.</p>
     </footer>
-</body>
+</body><script>
+    // Функция для анимации появления элементов
+    function animateOnScroll() {
+        const elements = document.querySelectorAll('.product-card, .philosophy, h2');
+        
+        elements.forEach(element => {
+            const elementTop = element.getBoundingClientRect().top;
+            const windowHeight = window.innerHeight;
+            
+            // Если элемент в поле зрения
+            if (elementTop < windowHeight - 100) {
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+                element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            }
+        });
+    }
+
+    // Настройка элементов перед анимацией
+    document.addEventListener('DOMContentLoaded', function() {
+        // Скрываем элементы, которые будут появляться
+        const animatedElements = document.querySelectorAll('.product-card, .philosophy, h2');
+        animatedElements.forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+        });
+        
+        // Запускаем при загрузке
+        animateOnScroll();
+        
+        // И при скролле
+        window.addEventListener('scroll', animateOnScroll);
+    });
+</script>
 </html>
