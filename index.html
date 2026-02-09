@@ -121,5 +121,26 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 </script>
+</body><!-- Telegram-виджет (подвал сайта) -->
+<script>
+    // Виджет будет показываться через 10 секунд после загрузки
+    setTimeout(() => {
+        const widget = document.createElement('script');
+        widget.src = 'https://telegram.org/js/telegram-widget.js?22';
+        widget.setAttribute('data-telegram-chat', 'position_consultant_bot');
+        widget.setAttribute('data-width', '320');
+        widget.setAttribute('data-height', '480');
+        widget.setAttribute('data-dark', '1');
+        widget.setAttribute('data-comment', 'Задайте вопрос по заказу');
+        document.body.appendChild(widget);
+    }, 10000);
+</script>
+
+<!-- Альтернатива: фиксированная кнопка в углу -->
+<a href="https://t.me/position_consultant_bot" 
+   style="position:fixed; bottom:20px; right:20px; background:#0088cc; color:white; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; text-decoration:none; z-index:9999; box-shadow:0 4px 15px rgba(0,136,204,0.3);"
+   target="_blank">
+   💬
+</a>
 </body>
 </html>
